@@ -72,13 +72,6 @@ model Participant {
   identifier String      @unique
   label      String?
   interviews Interview[]
-  status     String      @default("active")
-}
-
-enum Status {
-  active
-  inactive
-  deleted
 }
 
 model User {
