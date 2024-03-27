@@ -16,7 +16,7 @@ model Protocol {
   id            String      @id @default(cuid())
   hash          String      @unique
   name          String
-  schemaVersion Int
+  schemaVersion Int?       @default(7)
   description   String?
   importedAt    DateTime    @default(now())
   lastModified  DateTime
@@ -24,6 +24,17 @@ model Protocol {
   codebook      Json
   assets        Asset[]
   interviews    Interview[]
+  version       Version    @default(v7)
+}
+
+enum Version {
+  v1
+  v2
+  v3
+  v4
+  v5
+  v6
+  v7
 }
 
 model Asset {
@@ -61,6 +72,13 @@ model Participant {
   identifier String      @unique
   label      String?
   interviews Interview[]
+  status     String      @default("active")
+}
+
+enum Status {
+  active
+  inactive
+  deleted
 }
 
 model User {
