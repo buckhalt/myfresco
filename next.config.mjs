@@ -1,7 +1,3 @@
-/**
- * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
- * for Docker builds.
- */
 import('./env.mjs');
 import pkg from './package.json' assert { type: 'json' };
 import ChildProcess from 'child_process';
@@ -18,7 +14,7 @@ const config = {
   reactStrictMode: true,
   experimental: {
     typedRoutes: true,
-    webpackBuildWorker: true
+    webpackBuildWorker: true,
   },
   webpack: (config) => {
     config.module.rules.push({

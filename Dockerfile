@@ -1,21 +1,25 @@
-FROM node:18-alpine AS base
-RUN corepack enable
-ENV SKIP_ENV_VALIDATION=true
+FROM node:lts-alpine  AS base
 
 # Install dependencies only when needed
 FROM base AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+#RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Prisma stuff
 COPY prisma ./prisma
-# Install dependencies
-COPY package.json pnpm-lock.yaml* ./
-COPY postinstall.mjs ./postinstall.mjs
-RUN pnpm install
+
+# Copy package.json and lockfile, along with postinstall script
+COPY package.json pnpm-lock.yaml* postinstall.mjs ./
+
+# Install pnpm and install dependencies
+RUN corepack enable pnpm && pnpm i --frozen-lockfile
+
+# Generate Prisma Client
 RUN pnpm prisma generate
 
+
+# ---------
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -23,13 +27,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Install git - this is needed to get the app version during build
+RUN apk add --no-cache git
 
-ENV NEXT_TELEMETRY_DISABLED 1
-
-# Install git
-RUN apk update && apk add --no-cache git
-
-RUN pnpm run build
+RUN corepack enable pnpm && pnpm run build
 
 # If using npm comment out above and use below instead
 # RUN npm run build
@@ -39,7 +40,8 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
+
+# disable telemetry during runtime.
 ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
@@ -61,7 +63,7 @@ USER nextjs
 EXPOSE 3000
 
 ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
 
-CMD ["node", "server.js"]
+# server.js is created by next build from the standalone output
+# https://nextjs.org/docs/pages/api-reference/next-config-js/output
+CMD HOSTNAME="0.0.0.0" node server.js
