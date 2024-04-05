@@ -7,10 +7,12 @@ FROM base AS deps
 WORKDIR /app
 
 # Prisma stuff
-COPY prisma ./prisma
+COPY ./prisma prisma
 
 # Copy package.json and lockfile, along with postinstall script
-COPY package.json pnpm-lock.yaml* postinstall.mjs ./
+COPY package.json ./
+COPY pnpm-lock.yaml ./
+COPY postinstall.mjs ./
 
 # Install pnpm and install dependencies
 RUN corepack enable pnpm && pnpm i --frozen-lockfile

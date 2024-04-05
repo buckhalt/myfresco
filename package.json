@@ -10,9 +10,10 @@
     "lint": "SKIP_ENV_VALIDATION=true next lint",
     "ts-lint": "SKIP_ENV_VALIDATION=true tsc --noEmit --incremental --watch",
     "start": "next start",
-    "db-seed": "cross-env NODE_ENV=development prisma db seed",
-    "test": "jest --watch",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "start:prod": "NODE_ENV=production npm run db-migrate && npm run start",
+    "db-seed": "prisma db seed",
+    "db-migrate": "prisma migrate deploy",
+    "test": "jest --watch"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
