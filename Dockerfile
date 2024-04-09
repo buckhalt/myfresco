@@ -2,17 +2,16 @@ FROM node:lts-alpine  AS base
 
 # Install dependencies only when needed
 FROM base AS deps
+
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 #RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Prisma stuff
-COPY ./prisma prisma
+COPY prisma ./prisma
 
 # Copy package.json and lockfile, along with postinstall script
-COPY package.json ./
-COPY pnpm-lock.yaml ./
-COPY postinstall.mjs ./
+COPY package.json pnpm-lock.yaml* postinstall.mjs ./
 
 # Install pnpm and install dependencies
 RUN corepack enable pnpm && pnpm i --frozen-lockfile
