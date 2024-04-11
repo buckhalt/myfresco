@@ -11,14 +11,10 @@ WORKDIR /app
 COPY prisma ./prisma
 
 # Copy package.json and lockfile, along with postinstall script
-COPY package.json pnpm-lock.yaml* postinstall.mjs ./
+COPY package.json pnpm-lock.yaml* ./
 
 # Install pnpm and install dependencies
 RUN corepack enable pnpm && pnpm i --frozen-lockfile
-
-# Generate Prisma Client
-RUN pnpm prisma generate
-
 
 # ---------
 
@@ -59,6 +55,9 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Prisma stuff
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
 USER nextjs
 
 EXPOSE 3000
@@ -67,4 +66,4 @@ ENV PORT 3000
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD HOSTNAME="0.0.0.0" node server.js
+CMD HOSTNAME="0.0.0.0" npm run start:prod

@@ -223,7 +223,10 @@ $system-font-stack: 'system-ui', sans-serif;
   --nc-body-font-family: #{$system-font-stack};
   --code-font: courier;
   --interface-prompt-flex-basis: 8rem;
-  --nc-base-font-size: min(max(14px, calc(0.875rem + ((1vw - 6.4px) * 0.3125))), 18px);
+  --nc-base-font-size: min(
+    max(14px, calc(0.875rem + ((1vw - 6.4px) * 0.3125))),
+    18px
+  );
   --nc-border-radius: 0.75rem;
   --padding-unit: 1rem;
   --form-intro-panel-background: var(--color-cyber-grape);
@@ -247,7 +250,6 @@ $system-font-stack: 'system-ui', sans-serif;
   // Top level transparentised values
   --nc-transparent-light: #{transparentize(rgb(255, 255, 255), 0.7)};
   --nc-transparent-md: #{transparentize(rgb(128, 128, 128), 0.7)};
-
 
   --nc-narrative-heading-bg-hover: #{transparentize(rgb(22, 21, 43), 0.85)};
   --nc-narrative-border-bottom-color: #{transparentize(rgb(22, 21, 43), 0.85)};

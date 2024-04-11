@@ -4,15 +4,14 @@
   "private": true,
   "packageManager": "pnpm@8.15.5+sha256.4b4efa12490e5055d59b9b9fc9438b7d581a6b7af3b5675eb5c5f447cee1a589",
   "scripts": {
-    "build": "next build",
+    "build": "SKIP_ENV_VALIDATION=true next build",
     "dev": "next dev",
-    "postinstall": "node postinstall.mjs",
     "lint": "SKIP_ENV_VALIDATION=true next lint",
     "ts-lint": "SKIP_ENV_VALIDATION=true tsc --noEmit --incremental --watch",
     "start": "next start",
-    "start:prod": "NODE_ENV=production npm run db-migrate && npm run start",
-    "db-seed": "prisma db seed",
-    "db-migrate": "prisma migrate deploy",
+    "start:prod": "npm run db-migrate && node server.js",
+    "db-seed": "npx prisma db seed",
+    "db-migrate": "npx prisma migrate deploy",
     "test": "jest --watch"
   },
   "prisma": {
