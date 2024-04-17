@@ -3,7 +3,7 @@ import { auth } from '~/utils/auth';
 import * as context from 'next/headers';
 
 type CreateContextOptions = {
-  headers: Headers;
+  headers?: Headers;
   session: Session | null;
 };
 

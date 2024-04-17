@@ -6,7 +6,7 @@ import { ZodError } from 'zod';
 import { headers } from 'next/headers';
 import { experimental_createServerActionHandler } from '@trpc/next/app-dir/server';
 import { getServerSession } from '~/utils/auth';
-import 'server-only';
+// import 'server-only';
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -66,3 +66,5 @@ export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
 
 export const devProcedure = t.procedure.use(enforceDevEnvironment);
+
+export const createCallerFactory = t.createCallerFactory;

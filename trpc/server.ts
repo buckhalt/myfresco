@@ -1,5 +1,3 @@
-'use server';
-
 import { loggerLink } from '@trpc/client';
 import { experimental_createTRPCNextAppDirServer } from '@trpc/next/app-dir/server';
 import { experimental_nextCacheLink } from '@trpc/next/app-dir/links/nextCache';
@@ -8,7 +6,8 @@ import SuperJSON from 'superjson';
 import { env } from '~/env.mjs';
 import { appRouter, type AppRouter } from '~/server/router';
 import { getServerSession } from '~/utils/auth';
-import 'server-only';
+// import 'server-only';
+import { createCallerFactory } from '~/server/trpc';
 
 /**
  * This client invokes procedures directly on the server without fetching over HTTP.
@@ -98,3 +97,5 @@ export const api = experimental_createTRPCNextAppDirServer<AppRouter>({
 //     }),
 //   ],
 // });
+
+export const createCaller = createCallerFactory(appRouter);
