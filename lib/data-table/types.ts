@@ -1,6 +1,6 @@
 import { type Prisma } from '@prisma/client';
 import * as z from 'zod';
-import { numberEnum } from '~/shared/schemas/schemas';
+import { numberEnum } from '~/schemas/participant';
 
 export type Option = {
   label: string;
@@ -93,3 +93,5 @@ export const SearchParamsSchema = z.object({
   sortField: z.enum(sortableFields),
   filterParams: z.array(FilterParam).nullable(),
 });
+
+export type SearchParams = z.infer<typeof SearchParamsSchema>;

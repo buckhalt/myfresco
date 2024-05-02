@@ -62,7 +62,8 @@ export const createAction = experimental_createServerActionHandler(t, {
 
 export const router = t.router;
 export const middleware = t.middleware;
+export const createCallerFactory = t.createCallerFactory;
+
 export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
-
 export const devProcedure = t.procedure.use(enforceDevEnvironment);

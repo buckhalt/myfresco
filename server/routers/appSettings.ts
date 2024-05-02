@@ -5,17 +5,30 @@ import { UNCONFIGURED_TIMEOUT } from '~/fresco.config';
 import { z } from 'zod';
 import { signOutProc } from './session';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import { cache } from 'react';
 import { utapi } from '~/app/api/uploadthing/core';
+import { redirect } from 'next/navigation';
 
 const calculateIsExpired = (configured: boolean, initializedAt: Date) =>
   !configured && initializedAt.getTime() < Date.now() - UNCONFIGURED_TIMEOUT;
 
-export const getAppSettings = cache(async () => {
+export const getAppSettings = async () => {
   const appSettings = await prisma.appSettings.findFirst();
 
+  // If there are no app settings, create them
   if (!appSettings) {
-    return null;
+    const newAppSettings = await prisma.appSettings.create({
+      data: {
+        initializedAt: new Date(),
+      },
+    });
+
+    return {
+      ...newAppSettings,
+      expired: calculateIsExpired(
+        newAppSettings.configured,
+        newAppSettings.initializedAt,
+      ),
+    };
   }
 
   return {
@@ -25,18 +38,34 @@ export const getAppSettings = cache(async () => {
       appSettings.initializedAt,
     ),
   };
-});
+};
 
 export const appSettingsRouter = router({
   get: publicProcedure.query(getAppSettings),
-  getInstallationId: publicProcedure.query(async () => {
+  requireAppNotExpired: publicProcedure
+    .input(z.boolean().default(false))
+    .query(async ({ input: isSetupRoute }) => {
+      const appSettings = await getAppSettings();
+
+      if (appSettings.expired) {
+        redirect('/expired');
+      }
+
+      // If we are on the setup route, don't do any further redirection;
+      if (isSetupRoute) {
+        return;
+      }
+
+      if (!appSettings.configured) {
+        redirect('/setup');
+      }
+
+      return;
+    }),
+  isAppExpired: publicProcedure.query(async () => {
     const appSettings = await getAppSettings();
 
-    if (!appSettings) {
-      return null;
-    }
-
-    return appSettings.installationId;
+    return appSettings.expired;
   }),
   getAnonymousRecruitmentStatus: protectedProcedure.query(async () => {
     const appSettings = await prisma.appSettings.findFirst({
