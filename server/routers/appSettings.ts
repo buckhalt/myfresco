@@ -124,12 +124,12 @@ export const appSettingsRouter = router({
     try {
       // Delete all data:
       await Promise.all([
-       prisma.user.deleteMany(), // Deleting a user will cascade to Session and Key
-       prisma.participant.deleteMany(),
-       prisma.protocol.deleteMany(), // Deleting protocol will cascade to Interviews
-       prisma.appSettings.deleteMany(),
-       prisma.events.deleteMany(),
-       prisma.asset.deleteMany()
+        prisma.user.deleteMany(), // Deleting a user will cascade to Session and Key
+        prisma.participant.deleteMany(),
+        prisma.protocol.deleteMany(), // Deleting protocol will cascade to Interviews
+        prisma.appSettings.deleteMany(),
+        prisma.events.deleteMany(),
+        prisma.asset.deleteMany(),
       ]);
 
       revalidateTag('appSettings.get');
@@ -141,8 +141,8 @@ export const appSettingsRouter = router({
       revalidateTag('dashboard.getActivities');
 
       // Remove all files from UploadThing:
-      await utapi.listFiles({}).then((assets) => {
-        const keys = assets.map((asset) => asset.key);
+      await utapi.listFiles({}).then(({ files }) => {
+        const keys = files.map((file) => file.key);
         return utapi.deleteFiles(keys);
       });
     } catch (error) {
