@@ -1,25 +1,25 @@
 'use client';
 
+import type { AnyAction } from '@reduxjs/toolkit';
 import {
-  type ValueAnimationTransition,
   motion,
   useAnimate,
+  type ValueAnimationTransition,
 } from 'framer-motion';
-import { useSelector, useDispatch } from 'react-redux';
-import Navigation from '../components/Navigation';
-import {
-  getCurrentStage,
-  makeGetFakeSessionProgress,
-} from '../selectors/session';
-import Stage from './Stage';
+import { parseAsInteger, useQueryState } from 'nuqs';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getNavigationInfo } from '../selectors/session';
-import { getNavigableStages } from '../selectors/skip-logic';
+import { useDispatch, useSelector } from 'react-redux';
+import usePrevious from '~/hooks/usePrevious';
+import Navigation from '../components/Navigation';
 import { actionCreators as sessionActions } from '../ducks/modules/session';
 import useReadyForNextStage from '../hooks/useReadyForNextStage';
-import type { AnyAction } from '@reduxjs/toolkit';
-import usePrevious from '~/hooks/usePrevious';
-import { parseAsInteger, useQueryState } from 'nuqs';
+import {
+  getCurrentStage,
+  getNavigationInfo,
+  makeGetFakeSessionProgress,
+} from '../selectors/session';
+import { getNavigableStages } from '../selectors/skip-logic';
+import Stage from './Stage';
 
 type directions = 'forwards' | 'backwards';
 
@@ -60,7 +60,10 @@ export default function ProtocolScreen() {
   const dispatch = useDispatch();
 
   // State
-  const [, setQueryStep] = useQueryState('step', parseAsInteger.withDefault(0));
+  const [browserQueryStep, setQueryStep] = useQueryState(
+    'step',
+    parseAsInteger.withDefault(0),
+  );
   const [forceNavigationDisabled, setForceNavigationDisabled] = useState(false);
   const makeFakeSessionProgress = useSelector(makeGetFakeSessionProgress);
 
@@ -76,6 +79,21 @@ export default function ProtocolScreen() {
   const [progress, setProgress] = useState(
     makeFakeSessionProgress(currentStep, promptIndex),
   );
+
+  useEffect(() => {
+    console.log('triggered', browserQueryStep, currentStep);
+
+    if (forceNavigationDisabled) {
+      return;
+    }
+
+    if (browserQueryStep !== currentStep) {
+      console.log('running...');
+      dispatch(
+        sessionActions.updateStage(browserQueryStep) as unknown as AnyAction,
+      );
+    }
+  }, [browserQueryStep, currentStep, forceNavigationDisabled, dispatch]);
 
   // Refs
   const beforeNextFunction = useRef<BeforeNextFunction | null>(null);
@@ -201,9 +219,10 @@ export default function ProtocolScreen() {
     [moveForward, moveBackward],
   );
 
+  // Update the browser URL when the current step changes.
   useEffect(() => {
     if (currentStep !== prevCurrentStep) {
-      void setQueryStep(currentStep, { history: 'push' });
+      void setQueryStep(currentStep, { history: 'push' }); // Enable history push so back button works
     }
   }, [currentStep, prevCurrentStep, setQueryStep]);
 
