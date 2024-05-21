@@ -1,3 +1,5 @@
+Meaningless change - do not merge.
+
 # Fresco
 
 The Fresco project aims to bring Network Canvas interviews to the web browser. It is a pilot project that does not
