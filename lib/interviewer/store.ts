@@ -9,8 +9,6 @@ import installedProtocols from '~/lib/interviewer/ducks/modules/installedProtoco
 import sessions from '~/lib/interviewer/ducks/modules/session';
 import ui from '~/lib/interviewer/ducks/modules/ui';
 import type { NcNetwork } from '~/schemas/network-canvas';
-import logger from './ducks/middleware/logger';
-import sound from './ducks/middleware/sound';
 
 export const store = configureStore({
   reducer: {
@@ -22,7 +20,7 @@ export const store = configureStore({
     dialogs,
     ui,
   },
-  middleware: [thunk, logger, sound],
+  middleware: [thunk],
 });
 
 export type StageMetadataEntry = [number, string, string, boolean];
